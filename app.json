@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#243b4a"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -20,9 +20,10 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 4 ,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#243b4a"
       },
       "package": "com.dasbasti.pcbapp"
     },
