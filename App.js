@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
 import { Client, Message } from "react-native-paho-mqtt";
 import PcbPanel from "./PcbPanel";
@@ -78,10 +78,12 @@ export default function App() {
       }
     });
 
+  let scale = Math.floor(Dimensions.get("window").width / 80);
+
   return (
     <View style={styles.container}>
       <Text>{connectionState ? "online" : "offline"}</Text>
-      <PcbPanel str={pcbString} />
+      <PcbPanel scale={scale} str={pcbString} />
       <Text>{connectionInfoString}</Text>
       <StatusBar style="auto" />
     </View>
