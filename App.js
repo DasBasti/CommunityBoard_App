@@ -82,9 +82,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>{connectionState ? "online" : "offline"}</Text>
+      <Text style={styles.head}>platinenmacher.tech/pcb</Text>
       <PcbPanel scale={scale} str={pcbString} />
-      <Text>{connectionInfoString}</Text>
+      <Text style={styles.status}>
+        {connectionState ? "online" : "offline"}
+      </Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -95,6 +97,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#243b4a",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
+  },
+  head: {
+    fontSize: 25,
+  },
+  status: {
+    fontSize: 15,
+    color: "darkslategrey",
   },
 });
