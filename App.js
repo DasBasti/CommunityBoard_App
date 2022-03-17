@@ -147,4 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "darkslategrey",
   },
+  messages: {
+    margin: 5,
+  },
 });
