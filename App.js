@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Constants from "expo-constants";
 import { Client, Message } from "react-native-paho-mqtt";
 import PcbPanel from "./PcbPanel";
 import { ScreenOrientation } from "expo";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 function guidGenerator() {
   var S4 = function () {
@@ -87,6 +95,9 @@ export default function App() {
       <Text style={styles.status}>
         {connectionState ? "online" : "offline"}
       </Text>
+      <TouchableOpacity onPress={() => {}}>
+        <FontAwesome5 name="twitch" size={50} color="black" />
+      </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
   );
