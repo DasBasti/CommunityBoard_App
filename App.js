@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Constants from "expo-constants";
 import { Client, Message } from "react-native-paho-mqtt";
 import PcbPanel from "./PcbPanel";
 import { ScreenOrientation } from "expo";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import uuid from "react-native-uuid";
+import * as WebBrowser from "expo-web-browser";
 
 const storageID = "PCB-App-UUID";
 
@@ -97,16 +97,30 @@ export default function App() {
 
   let scale = Math.floor(Dimensions.get("window").width / 80);
 
+  const _handlePressButtonAsync = async (url) => {
+    WebBrowser.openBrowserAsync(url);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.head}>platinenmacher.tech/pcb</Text>
+      <TouchableOpacity
+        onPress={() => {
+          _handlePressButtonAsync("https://platinenmacher.tech/pcb");
+        }}
+      >
+        <Text style={styles.head}>platinenmacher.tech/pcb</Text>
+      </TouchableOpacity>
       <PcbPanel scale={scale} str={pcbString} />
+      <TouchableOpacity
+        onPress={() => {
+          _handlePressButtonAsync("https://www.twitch.tv/platinenmacher");
+        }}
+      >
+        <FontAwesome5 name="twitch" size={50} color="black" />
+      </TouchableOpacity>
       <Text style={styles.status}>
         {connectionState ? "online" : "offline"}
       </Text>
-      <TouchableOpacity onPress={() => {}}>
-        <FontAwesome5 name="twitch" size={50} color="black" />
-      </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
   );
