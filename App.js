@@ -47,6 +47,7 @@ export default function App() {
     "sssssssssssssbsswsssssbsswssssbssswgsbssssgggbsssssgbsbssssssbss"
   );
   const [connectionState, updateConnectionState] = useState(false);
+  const [lastChat, updateLastChat] = useState("");
   const [connectionInfoString, setConnectionInfoString] = useState("");
   const [deviceId, setDeviceId] = useState(undefined);
 
@@ -75,7 +76,11 @@ export default function App() {
       updateConnectionState(false);
     });
     client.on("messageReceived", (message) => {
-      setPcbString(message.payloadString);
+      if (message.destinationName.startsWith("pcb/chat/"))
+        updateLastChat(
+          message.destinationName.substring(9) + ": " + message.payloadString
+        );
+      else setPcbString(message.payloadString);
       console.log(message.payloadString);
     });
 
@@ -83,6 +88,7 @@ export default function App() {
     client
       .connect()
       .then(() => {
+        client.subscribe("pcb/chat/#");
         return client.subscribe("pcb/all/stream/enc");
       })
       .then(() => {
@@ -121,6 +127,7 @@ export default function App() {
       <Text style={styles.status}>
         {connectionState ? "online" : "offline"}
       </Text>
+      <Text style={styles.message}>{lastChat}</Text>
       <StatusBar style="auto" />
     </View>
   );
