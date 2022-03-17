@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
-  Button,
   Dimensions,
   StyleSheet,
   Text,
@@ -14,28 +13,25 @@ import { Client, Message } from "react-native-paho-mqtt";
 import PcbPanel from "./PcbPanel";
 import { ScreenOrientation } from "expo";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
+import uuid from "react-native-uuid";
 
-function guidGenerator() {
-  var S4 = function () {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-  };
-  return (
-    S4() +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    "-" +
-    S4() +
-    S4() +
-    S4()
-  );
-}
+const storageID = "PCB-App-UUID";
 
 export default function App() {
+  function guidGenerator() {
+    SecureStore.getItemAsync(storageID).then(
+      (stored_id) => {
+        setDeviceId(stored_id);
+      },
+      () => {
+        const id = uuid.v4().substring(0, 8);
+        SecureStore.setItemAsync(storageID, id).then(() => {
+          setDeviceId(id);
+        });
+      }
+    );
+  }
   //Set up an in-memory alternative to global localStorage
   const myStorage = {
     setItem: (key, item) => {
@@ -52,39 +48,52 @@ export default function App() {
   );
   const [connectionState, updateConnectionState] = useState(false);
   const [connectionInfoString, setConnectionInfoString] = useState("");
-  const deviceId = guidGenerator();
-  const client = new Client({
-    uri: "wss://platinenmacher.tech/mqtt",
-    clientId: "pcbapp-" + deviceId,
-    storage: myStorage,
-  });
-  client.on("connectionLost", (responseObject) => {
-    if (responseObject.errorCode !== 0) {
-      //setConnectionInfoString(responseObject.errorMessage);
-      console.log(responseObject.errorMessage);
-    }
-    updateConnectionState(false);
-  });
-  client.on("messageReceived", (message) => {
-    setPcbString(message.payloadString);
-    console.log(message.payloadString);
-  });
+  const [deviceId, setDeviceId] = useState(undefined);
 
-  // connect the client
-  client
-    .connect()
-    .then(() => {
-      return client.subscribe("pcb/all/stream/enc");
-    })
-    .then(() => {
-      updateConnectionState(true);
-    })
-    .catch((responseObject) => {
-      if (responseObject.errorCode !== 0) {
-        console.log("onConnectionLost:" + responseObject.errorMessage);
-        setConnectionInfoString(responseObject.errorMessage);
-      }
+  useEffect(() => {
+    guidGenerator();
+  }, []);
+
+  useEffect(() => {
+    if (!deviceId) {
+      return;
+    }
+    const client = new Client({
+      uri: "wss://platinenmacher.tech/mqtt",
+      clientId: "pcbapp-" + deviceId,
+      storage: myStorage,
     });
+    client.on("connectionLost", (responseObject) => {
+      if (responseObject.errorCode !== 0) {
+        //setConnectionInfoString(responseObject.errorMessage);
+        console.log(
+          "Connection Lost",
+          responseObject.errorCode,
+          responseObject.errorMessage
+        );
+      }
+      updateConnectionState(false);
+    });
+    client.on("messageReceived", (message) => {
+      setPcbString(message.payloadString);
+      console.log(message.payloadString);
+    });
+
+    // connect the client
+    client
+      .connect()
+      .then(() => {
+        return client.subscribe("pcb/all/stream/enc");
+      })
+      .then(() => {
+        updateConnectionState(true);
+      })
+      .catch((responseObject) => {
+        if (responseObject.errorCode !== 0) {
+          setConnectionInfoString(responseObject.errorMessage);
+        }
+      });
+  }, [deviceId]);
 
   let scale = Math.floor(Dimensions.get("window").width / 80);
 
