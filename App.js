@@ -20,17 +20,15 @@ const storageID = "PCB-App-UUID";
 
 export default function App() {
   function guidGenerator() {
-    SecureStore.getItemAsync(storageID).then(
-      (stored_id) => {
-        setDeviceId(stored_id);
-      },
-      () => {
+    SecureStore.getItemAsync(storageID).then((stored_id) => {
+      if (stored_id) setDeviceId(stored_id);
+      else {
         const id = uuid.v4().substring(0, 8);
         SecureStore.setItemAsync(storageID, id).then(() => {
           setDeviceId(id);
         });
       }
-    );
+    });
   }
   //Set up an in-memory alternative to global localStorage
   const myStorage = {
