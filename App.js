@@ -48,6 +48,7 @@ export default function App() {
   const [lastChat, updateLastChat] = useState("");
   const [connectionInfoString, setConnectionInfoString] = useState("");
   const [deviceId, setDeviceId] = useState(undefined);
+  const [reconnectCounter, setReconnectCounter] = useState(0);
 
   useEffect(() => {
     guidGenerator();
@@ -71,15 +72,19 @@ export default function App() {
           responseObject.errorMessage
         );
       }
+      setReconnectCounter(reconnectCounter + 1);
       updateConnectionState(false);
     });
     client.on("messageReceived", (message) => {
-      if (message.destinationName.startsWith("pcb/chat/"))
+      if (message.destinationName.startsWith("pcb/chat/")) {
+        console.log("chat", message.payloadString);
         updateLastChat(
           message.destinationName.substring(9) + ": " + message.payloadString
         );
-      else setPcbString(message.payloadString);
-      console.log(message.payloadString);
+      } else if (message.destinationName.startsWith("pcb/all/stream/enc")) {
+      console.log("icon",message.payloadString);
+      setPcbString(message.payloadString);
+      }
     });
 
     // connect the client
@@ -97,7 +102,7 @@ export default function App() {
           setConnectionInfoString(responseObject.errorMessage);
         }
       });
-  }, [deviceId]);
+  }, [deviceId, reconnectCounter]);
 
   let scale = Math.floor(Dimensions.get("window").width / 80);
 
