@@ -78,9 +78,11 @@ export default function App() {
     client.on("messageReceived", (message) => {
       if (message.destinationName.startsWith("pcb/chat/")) {
         console.log("chat", message.payloadString);
-        updateLastChat(
-          message.destinationName.substring(9) + ": " + message.payloadString
-        );
+        if(message.payloadString.startsWith("!pcb")){
+          updateLastChat(
+            message.destinationName.substring(9) + ": " + message.payloadString
+            );
+          }
       } else if (message.destinationName.startsWith("pcb/all/stream/enc")) {
       console.log("icon",message.payloadString);
       setPcbString(message.payloadString);
