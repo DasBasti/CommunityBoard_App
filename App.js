@@ -8,9 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Client, Message } from "react-native-paho-mqtt";
+import { Client } from "react-native-paho-mqtt";
 import PcbPanel from "./PcbPanel";
-import { ScreenOrientation } from "expo";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 import uuid from "react-native-uuid";
@@ -28,7 +27,10 @@ export default function App() {
           setDeviceId(id);
         });
       }
-    });
+    }).catch((e)=>{
+      const id = uuid.v4().substring(0, 8);
+      setDeviceId(id);
+    })
   }
   //Set up an in-memory alternative to global localStorage
   const myStorage = {
